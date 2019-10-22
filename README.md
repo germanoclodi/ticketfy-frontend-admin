@@ -1,4 +1,4 @@
-# JobsX Front-end Admin
+# Ticketfy - Front-end Admin
 
 ## Team
 
