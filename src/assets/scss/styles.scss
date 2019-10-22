@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css?family=Pacifico&display=swap");
+
+$font: "Pacifico", cursive;
+$font2: monospace;
+$primary: #40062a;
+$white: #fff;
+$grey: grey;
+
+body{
+    font-family: $font2;
+}
+
+.navbar {
+  background: $primary;
+
+  .navbar-brand {
+    color: $white;
+    font-family: $font;
+
+    &:hover{
+        color: $white;
+    }
+  }
+  .navbar-text{
+      color: $grey;
+      font-size: small;
+  }
+}
+
+.form-group {
+  .form-control{
+    border-radius: 0;
+    color: $primary;
+  }
+}
+
+.btn-primary{
+    background: $primary;
+    color: $white;
+    border: 0;
+    border-radius: 0;
+    padding: 10px 25px;
+    font-weight: bold;
+
+    &:hover{
+        background: $primary;
+        color: $white;
+        border: 0;
+        border-radius: 0;
+        opacity: .7;
+    }
+    &:focus {
+        background: $primary;
+        color: $white;
+        border: 0;
+        border-radius: 0;
+        opacity: .7;
+    }
+
+    &:active{
+        background: $primary;
+        color: $white;
+        border: 0;
+        border-radius: 0;
+        opacity: .7;
+    }
+
+    &:not(:disabled):not(.disabled):active{
+        background: $primary;
+        color: $white;
+        border: 0;
+        border-radius: 0;
+        opacity: .7;
+    }
+}
+
+// Component Modal
+
+.simple-modal{
+
+    &.open{
+        display: block;
+    }
+
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    display: block;
+    margin: auto;
+    background: rgba(0,0,0,.6);
+    padding: 1rem .25rem;
+    display: none;
+}
+
+// Login Page
+.login{
+    .card{
+        .card-header{
+            border: 0;
+            padding: 0;
+            font-family: $font2;
+        }
+    }
+}
+
+.blur{
+    -webkit-filter: blur(3px);
+    -moz-filter: blur(3px);
+    -o-filter: blur(3px);
+    -ms-filter: blur(3px);
+    filter: blur(3px);
+}
+
+h1, h5, h6{
+    color: $primary;
+    font-weight: bold;
+}
+
+.table td, .table th{
+    vertical-align: middle;
+}
