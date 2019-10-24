@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 // import { Link } from "react-router-dom";
-// import api from "../../services/api";
+import api from "../../services/api";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -18,8 +18,10 @@ export default class Dashboard extends Component {
         tickets: [],
         modal: false,
         modalEdit: false,
+        modalLog: false,
         ticket: {},
-        ticketObs: []
+        ticketObs: [],
+        logs: []
     }
 
     componentDidMount() {
@@ -29,7 +31,7 @@ export default class Dashboard extends Component {
     toggleModal = (ticket = {}) => {
 
         const a = [];
-        if(ticket.descricao !== undefined){
+        if (ticket.descricao !== undefined) {
             const desc = ticket.descricao.split(" |!| ");
             desc.forEach(item => {
                 a.push(item);
@@ -40,6 +42,12 @@ export default class Dashboard extends Component {
 
     toggleModalEdit = (ticket = {}) => {
         this.setState({ modalEdit: !this.state.modalEdit, ticket: ticket });
+    }
+
+    toggleModalLog = async (ticket) => {
+        this.setState({ modalLog: !this.state.modalLog, ticket: ticket });
+        const response = await api.get(`/log/${ticket.id}`)
+        this.setState({ logs: response.data });
     }
 
     getTickets = async () => {
@@ -66,9 +74,16 @@ export default class Dashboard extends Component {
         }
         await sender.put(`/tickets/${this.state.ticket.id}`, { ticket: this.state.ticket })
             .then(response => {
-                this.getTickets();
-                this.toggleModalEdit();
-                document.getElementsByTagName("textarea")[0].value="";
+                api.post("/log", { ticketId: this.state.ticket.id, description: "Status alterado para " + this.state.ticket.status + "." })
+                    .then(res => {
+                        this.getTickets();
+                        this.toggleModalEdit();
+                        document.getElementsByTagName("textarea")[0].value = "";
+                        console.log(res);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
             }).catch(error => {
                 console.log(error);
             });
@@ -78,6 +93,8 @@ export default class Dashboard extends Component {
         const tickets = this.state.tickets;
         const ticket = this.state.ticket;
         const ticketObs = this.state.ticketObs;
+        const logs = this.state.logs;
+
         return (
             <>
                 <Navbar expand="lg" className="mb-5">
@@ -112,8 +129,11 @@ export default class Dashboard extends Component {
                                                 <span onClick={() => this.toggleModal(ticket)} className="mr-2">
                                                     <MaterialIcon icon="remove_red_eye" />
                                                 </span>
-                                                <span onClick={() => this.toggleModalEdit(ticket)}>
+                                                <span onClick={() => this.toggleModalEdit(ticket)} className="mr-2">
                                                     <MaterialIcon icon="settings" />
+                                                </span>
+                                                <span onClick={() => this.toggleModalLog(ticket)}>
+                                                    <MaterialIcon icon="insert_drive_file" />
                                                 </span>
                                             </td>
                                         </tr>
@@ -126,10 +146,10 @@ export default class Dashboard extends Component {
                 <SimpleModal show={this.state.modal}>
                     <Container>
                         <Row className="mb-5">
-                            <Col xs={6} className="d-flex align-items-center">
+                            <Col xs={8} className="d-flex align-items-center">
                                 <h5>Ticket - {ticket.titulo}</h5>
                             </Col>
-                            <Col xs={6} className="d-flex align-items-center justify-content-end">
+                            <Col xs={4} className="d-flex align-items-center justify-content-end">
                                 <span onClick={this.toggleModal}>
                                     <MaterialIcon icon="close" />
                                 </span>
@@ -164,10 +184,10 @@ export default class Dashboard extends Component {
                 <SimpleModal show={this.state.modalEdit}>
                     <Container>
                         <Row className="mb-5">
-                            <Col xs={6} className="d-flex align-items-center">
+                            <Col xs={8} className="d-flex align-items-center">
                                 <h5>Ticket - {ticket.titulo}</h5>
                             </Col>
-                            <Col xs={6} className="d-flex align-items-center justify-content-end">
+                            <Col xs={4} className="d-flex align-items-center justify-content-end">
                                 <span onClick={this.toggleModalEdit}>
                                     <MaterialIcon icon="close" />
                                 </span>
@@ -195,6 +215,28 @@ export default class Dashboard extends Component {
                                         </Button>
                                     </div>
                                 </Form>
+                            </Col>
+                        </Row>
+                    </Container>
+                </SimpleModal>
+                <SimpleModal show={this.state.modalLog}>
+                    <Container>
+                        <Row className="mb-5">
+                            <Col xs={8} className="d-flex align-items-center">
+                                <h5>Ticket - {ticket.titulo}</h5>
+                            </Col>
+                            <Col xs={4} className="d-flex align-items-center justify-content-end">
+                                <span onClick={this.toggleModalLog}>
+                                    <MaterialIcon icon="close" />
+                                </span>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs={12} sm={6} className="mb-4">
+                                {logs.map((log, index) => (
+                                    <p key={index}>{index + 1} - {log.description}</p>
+                                ))}
+                                {(logs.length === 0) ? <p>Nenhuma alteração realizada.</p> : <></>}
                             </Col>
                         </Row>
                     </Container>
