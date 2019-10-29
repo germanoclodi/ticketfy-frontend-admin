@@ -11,6 +11,7 @@ import Button from 'react-bootstrap/Button';
 import MaterialIcon from 'material-icons-react';
 import SimpleModal from "../../components/SimpleModal/index";
 import Form from 'react-bootstrap/Form';
+import Alert from 'react-bootstrap/Alert';
 
 export default class Dashboard extends Component {
 
@@ -21,11 +22,21 @@ export default class Dashboard extends Component {
         modalLog: false,
         ticket: {},
         ticketObs: [],
-        logs: []
+        logs: [],
+        oldLength: 0,
+        firstRefresh: 0,
+        newLenght: 0
     }
 
     componentDidMount() {
-        this.getTickets()
+        this.getTickets();
+        this.notification();
+    }
+
+    notification = () => {
+        setInterval(() => {
+            this.getTickets();
+        }, 5000);
     }
 
     toggleModal = (ticket = {}) => {
@@ -51,7 +62,17 @@ export default class Dashboard extends Component {
     }
 
     getTickets = async () => {
+        // this.setState({ newLenght: 0});
         const response = await sender.get("/tickets");
+        if (this.state.firstRefresh === 0) {
+            this.setState({ oldLength: response.data.data.length, firstRefresh: 1 });
+        } else {
+            const lgt = parseInt(response.data.data.length) - parseInt(this.state.oldLength);
+            this.setState({
+                newLenght: lgt,
+                oldLength: response.data.data.length
+            });
+        }
         this.setState({ tickets: response.data.data });
     }
 
@@ -94,6 +115,16 @@ export default class Dashboard extends Component {
         const ticket = this.state.ticket;
         const ticketObs = this.state.ticketObs;
         const logs = this.state.logs;
+        const lgt = this.state.newLenght;
+
+        const notifications = [];
+        for (let i = 0; i < lgt; i++) {
+            notifications.push(
+                <Alert variant={"success"}>
+                    Você recebeu uma nova notificação!
+                </Alert>
+            )
+        }
 
         return (
             <>
@@ -140,6 +171,11 @@ export default class Dashboard extends Component {
                                     ))}
                                 </tbody>
                             </Table>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={12}>
+                            {notifications}
                         </Col>
                     </Row>
                 </Container>
